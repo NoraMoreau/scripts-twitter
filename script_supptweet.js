@@ -1,5 +1,3 @@
-(() => {
-
 //TEST
 /*
 var tweets = document.querySelectorAll('[data-testid="primaryColumn"] [data-testid="tweet"]');
@@ -11,20 +9,22 @@ annulRetweet(tweet);
 
 */
 
+(() => {
+
+
 /***********************************************/
 /*** APPARITION D'UN ELEMENT DANS LA FENETRE ***/
-/***********************************************/
 function apparitionElement(selecteur, delai = 5000) {
 	return new Promise((resolue, rejetee) => {
 		let debut = Date.now();
 		let sablier = setInterval(() => {
 			if(document.querySelector(selecteur)) {
-				resolue(document.querySelector(selecteur));
 				clearInterval(sablier);
+				resolue(document.querySelector(selecteur));
 
 			} else if (Date.now() - debut > delai) {
-				rejetee();
 				clearInterval(sablier);
+				rejetee();
 			}
 		}, 100);
 	});
@@ -32,20 +32,19 @@ function apparitionElement(selecteur, delai = 5000) {
 
 /************************************************/
 /*** DISPARITION D'UN ELEMENT DANS LA FENETRE ***/
-/************************************************/
 function disparitionElement(selecteur, tweet, delai = 5000) {
 	return new Promise((resolue, rejetee) => {
 		let debut = Date.now();
 		let sablier = setInterval(() => {
 			if(!document.querySelector(selecteur)) {
-				resolue();
 				clearInterval(sablier);
+				resolue();
 
 			} else if (Date.now() - debut > delai) {
-				console.error("Le tweet n'a pas été supprimé");
+				clearInterval(sablier);
+				console.error("Le tweet n'a pas été supprimé de la page");
 				console.error(tweet);
 				rejetee();
-				clearInterval(sablier);
 			}
 		}, 100);
 	});
@@ -64,10 +63,11 @@ async function suppTweet(tweet) {
 	//Appuie sur supprimer dans le menu déroulant,
 	try {
 		let menuDeroulantTweet = await apparitionElement('[data-testid="Dropdown"]');
-		let suppBouton = menuDeroulantTweet.querySelector('[role="menuitem"] span');
+		let spans = menuDeroulantTweet.querySelectorAll('[role="menuitem"] span')
+		let suppBouton = Array.from(spans).find(s => s.innerText.trim() == "Supprimer");
 		suppBouton.click();
 	} catch {
-		console.error("PROBLEME : promesse d'apparition d'élèment rejetee, attente trop longue");
+		console.error("PROBLEME <Menu deroulant info tweet> : promesse d'apparition d'élèment rejetee, attente trop longue");
 	}
 
 	//Verifie que la fenêtre de confirmation de suppression apparaisse bien après le click sur supprimer
@@ -78,7 +78,7 @@ async function suppTweet(tweet) {
 		confirmationSuppBouton.click();
 		await disparitionElement('[data-testid="confirmationSheetConfirm"]', tweet);
 	} catch {
-		console.error("PROBLEME : promesse d'apparition d'élèment rejetee, attente trop longue");
+		console.error("PROBLEME <Menu confirmation suppresion tweet> : promesse d'apparition d'élèment rejetee, attente trop longue");
 	}
 }
 
@@ -88,6 +88,7 @@ async function suppTweet(tweet) {
 /************************************/
 async function annulRetweet(tweet) {
 	//Appuie sur l'icone unretweet
+	console.log(estRetweet(tweet));
 	tweet.querySelector('[data-testid="unretweet"]').click();
 
 	//Verifie que la fenêtre de unretweet apparaisse bien après le click sur l'icone
@@ -98,7 +99,7 @@ async function annulRetweet(tweet) {
 		annulRetweetBouton.click();
 		await disparitionElement('[data-testid="unretweetConfirm"]', tweet);
 	} catch {
-		console.error("PROBLEME : promesse d'apparition d'élèment rejetee, attente trop longue");
+		console.error("PROBLEME <Menu deroulant unretweet> : promesse d'apparition d'élèment rejetee, attente trop longue");
 	}
 }
 
@@ -141,7 +142,7 @@ function premierTweetVisible() {
 /*************************************/
 async function scrollBoucle() {
 	let debut = Date.now();
-	while(Date.now() - debut < 5000){
+	while(Date.now() - debut < 7000){
 
 		//On récupère le premier tweet visible de la fenêtre
 		let tweet = premierTweetVisible();
@@ -158,14 +159,12 @@ async function scrollBoucle() {
 			//Si c'est un retweet annuler le retweet
 			} else if(estRetweet(tweet)) {
 				console.log("RETWEET ", pseudo);
-				console.log(tweet.querySelector('[data-testid="tweetText"]').innerText);
-				annulRetweet(tweet);
+				await annulRetweet(tweet);
 
 			//Si c'est un tweet à moi supprimer avec les trois petits points
 			} else if(estMonTweet(tweet)) {
 				console.log("TWEET ", pseudo);
-				console.log(tweet.querySelector('[data-testid="tweetText"]').innerText);
-				suppTweet(tweet);
+				await suppTweet(tweet);
 
 			//Un truc imprévu
 			} else {
@@ -177,7 +176,7 @@ async function scrollBoucle() {
 			window.scrollBy(0, window.innerHeight*0.9);
 		}
 
-		await new Promise(r => setTimeout(r, 100));
+		await new Promise(tps => setTimeout(tps, 500));
 	}
 }
 
@@ -190,7 +189,6 @@ async function scrollBoucle() {
 let monPseudo = "@" + window.location.pathname.split("/")[1];
 console.log("Pseudo ", monPseudo);
 scrollBoucle();
+console.log("FIN DU PROGRAMME");
 
 })();
-
-

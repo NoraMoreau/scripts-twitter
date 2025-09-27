@@ -5,7 +5,9 @@
     "description": "Extension permettant à un profil twitter de supprimer facilement ses tweet et retweet",
     
     "permissions": [
-        "https://x.com/*"
+        "https://x.com/*",
+        "scripting",
+    "tabs"
     ],
 
     "browser_action": {
@@ -18,12 +20,6 @@
 
     "background": {
         "scripts": ["background.js"]
-    },
+    }
 
-    "content_scripts": [
-        {
-            "matches": ["https://x.com/*"],
-            "js": ["content_scripts.js"]
-        }
-    ]
 }

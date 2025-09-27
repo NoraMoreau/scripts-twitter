@@ -1,19 +1,9 @@
-//TEST
-/*
-var tweets = document.querySelectorAll('[data-testid="primaryColumn"] [data-testid="tweet"]');
-var tweet = Array.from(tweets).find(t => {
-	var positionTweet = t.getBoundingClientRect();
-	return positionTweet.top >=60
-});
-annulRetweet(tweet);
-
-*/
-
 (() => {
 
 
 /***********************************************/
 /*** APPARITION D'UN ELEMENT DANS LA FENETRE ***/
+/***********************************************/
 function apparitionElement(selecteur, delai = 5000) {
 	return new Promise((resolue, rejetee) => {
 		let debut = Date.now();
@@ -32,6 +22,7 @@ function apparitionElement(selecteur, delai = 5000) {
 
 /************************************************/
 /*** DISPARITION D'UN ELEMENT DANS LA FENETRE ***/
+/***********************************************/
 function disparitionElement(selecteur, tweet, delai = 5000) {
 	return new Promise((resolue, rejetee) => {
 		let debut = Date.now();
@@ -54,7 +45,6 @@ function disparitionElement(selecteur, tweet, delai = 5000) {
 /************************************/
 /*** SUPPRESSION D'UN TWEET A SOI ***/
 /************************************/
-//penser à mettre des sécurité pour pas que ça plante
 async function suppTweet(tweet) { 
 	//Appuie sur les 3 petits points du tweet
 	tweet.querySelector('[type="button"], [data-testid="caret"]').click();
@@ -88,7 +78,6 @@ async function suppTweet(tweet) {
 /************************************/
 async function annulRetweet(tweet) {
 	//Appuie sur l'icone unretweet
-	console.log(estRetweet(tweet));
 	tweet.querySelector('[data-testid="unretweet"]').click();
 
 	//Verifie que la fenêtre de unretweet apparaisse bien après le click sur l'icone
@@ -142,7 +131,7 @@ function premierTweetVisible() {
 /*************************************/
 async function scrollBoucle() {
 	let debut = Date.now();
-	while(Date.now() - debut < 7000){
+	while(Date.now() - debut < 10000){
 
 		//On récupère le premier tweet visible de la fenêtre
 		let tweet = premierTweetVisible();
@@ -176,8 +165,10 @@ async function scrollBoucle() {
 			window.scrollBy(0, window.innerHeight*0.9);
 		}
 
-		await new Promise(tps => setTimeout(tps, 500));
+		await new Promise(tps => setTimeout(tps, 400));
 	}
+
+	console.log("FIN DU PROGRAMME");
 }
 
 
@@ -187,8 +178,7 @@ async function scrollBoucle() {
 /***************************************************/
 /***************************************************/
 let monPseudo = "@" + window.location.pathname.split("/")[1];
-console.log("Pseudo ", monPseudo);
+console.log("SUPPRESSION TWEET DE ", monPseudo);
 scrollBoucle();
-console.log("FIN DU PROGRAMME");
 
 })();

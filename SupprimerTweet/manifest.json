@@ -1,0 +1,25 @@
+{
+    "manifest_version": 3,
+    "name": "",
+    "version": 0.1,
+    "description": "Extension permettant à un profil twitter de supprimer facilement ses tweet et retweet",
+    
+    "host_permissions": [
+        "https://x.com/*"
+    ],
+
+    "action": {
+        "default_popup": "popup.html"
+    },
+
+    "background": {
+        "service_worker": "background.js"
+    },
+
+    "content_scripts": [
+        {
+            "matches": ["https://x.com/*"],
+            "js": ["content_scripts.js"]
+        }
+    ]
+}

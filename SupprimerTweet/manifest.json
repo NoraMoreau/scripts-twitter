@@ -7,7 +7,8 @@
     "permissions": [
         "https://x.com/*",
         "scripting",
-    "tabs"
+        "storage",
+        "tabs"
     ],
 
     "browser_action": {
@@ -20,6 +21,13 @@
 
     "background": {
         "scripts": ["background.js"]
-    }
+    },
+
+    "content_scripts": [
+        {
+            "matches": ["https://x.com/*"],
+            "js": ["recup_pseudo.js"]
+        }
+    ]
 
 }

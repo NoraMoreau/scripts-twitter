@@ -1,26 +1,21 @@
 {
-    "manifest_version": 2,
+    "manifest_version": 3,
     "name": "Supprimer tweet",
     "version": "0.1",
     "description": "Extension permettant à un profil twitter de supprimer facilement ses tweet et retweet",
     
     "permissions": [
-        "https://x.com/*",
         "scripting",
         "storage",
         "tabs"
     ],
 
-    "browser_action": {
-        "default_popup": "popup.html"
-    },
+    "host_permissions": [
+        "https://x.com/*"
+    ],
 
-    "page_action": {
+    "action": {
         "default_popup": "popup.html"
-    },
-
-    "background": {
-        "scripts": ["background.js"]
     },
 
     "content_scripts": [

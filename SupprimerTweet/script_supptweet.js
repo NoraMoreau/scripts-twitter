@@ -1,5 +1,13 @@
 (() => {
 
+async function boutonDesactive() {
+	let etatBouton = await browser.storage.local.get("activeBoutonSuppression");
+
+	if (etatBouton.activeBoutonSuppression) {
+		let boutonActif = document.querySelector('[class="activeBouton"]');
+		boutonActif.classList.remove("activeBouton");
+	}
+}
 
 /***********************************************/
 /*** APPARITION D'UN ELEMENT DANS LA FENETRE ***/
@@ -47,7 +55,7 @@ function disparitionElement(selecteur, tweet, delai = 5000) {
 /************************************/
 async function suppTweet(tweet) { 
 	//Appuie sur les 3 petits points du tweet
-	tweet.querySelector('[type="button"], [data-testid="caret"]').click();
+	tweet.querySelector('[data-testid="caret"]').click();
 
 	//Vérifie que le manu apparaisse bien après le click sur les ...
 	//Appuie sur supprimer dans le menu déroulant,
@@ -168,6 +176,7 @@ async function scrollBoucle() {
 		await new Promise(tps => setTimeout(tps, 400));
 	}
 
+	boutonDesactive();
 	console.log("FIN DU PROGRAMME");
 }
 

@@ -7,8 +7,25 @@
     </head>
 
     <body>
-        <div class="lancer_suppression">
-            <div class="bouton_lancer_suppression">Supprimer tweets</div>
+        <div class="suppression_filtree">
+            <p class="texte_suppression_filtree">Suppression filtree</p>
+
+            <div class="texte_arg_filtrage">DATE</div>
+            <div class="filtre_date">
+                <input type="text" class="date_debut" placeholder="debut">
+                <input type="text" class="date_fin" placeholder="fin">
+            </div>
+
+            <div class="texte_arg_filtrage">PSEUDO</div>
+            <div class="filtre_pseudo">
+                <input type="text" class="pseudo" placeholder="pseudo">
+            </div>
+            <div class="bouton_lancer_suppression"></div>
+        </div>
+
+        <div class="suppression_totale">
+            <p class="texte_suppression_totale">Supprimer tous les tweets<br>du profil</p>
+            <div class="bouton_lancer_suppression"></div>
         </div>
          <script src="popup.js"></script>
     </body>

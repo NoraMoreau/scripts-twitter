@@ -40,6 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         //Il nous faut au moins un des arguments pour lancer ce bouton
         if(dateDebutFiltre != null || dateFinFiltre != null || pseudoFiltre != null) {
+            console.log("Date début : ", dateDebutFiltre);
+            console.log("Date fin : ", dateFinFiltre);
+            console.log("Pseudo : ", pseudoFiltre);
             //Le bouton change de couleur et le script de suppression peut être lancé
             bouton.classList.add("activeBouton");
             browser.storage.local.set({ activeBoutonSuppression: "activeBoutonSuppressionFiltree" });
@@ -47,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 target: { tabId: tab_active[0].id },
                 files: ["script_supptweet.js"] 
             });
+            arretSuppression(bouton);
         }
     }
 

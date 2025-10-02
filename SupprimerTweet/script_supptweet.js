@@ -125,14 +125,20 @@ function premierTweetVisible() {
 	});
 }
 
-/*************************************/
+/************************************/
 /***** GERE LES FILTRES DE DATE *****/
-/*************************************/
+/************************************/
 async function dateTweet() {
 	let tweet = premierTweetVisible();
-	//on recup sa date
+	if(tweet) {
+		let date = new Date( tweet.querySelector('time').getAttribute('datetime'));
+		return date.split('T')[0];
+	}
 }
 
+/*********************************************************/
+/***** VERIFIE SI ON SE TROUVE TOUT EN BAS DU PROFIL *****/
+/*********************************************************/
 async function finProfil() {
 	let basPage = window.innerHeight + window.scrollY;
 	let hauteurTotale = document.documentElement.scrollHeight;
@@ -165,13 +171,18 @@ async function scrollBoucle() {
 
 		//Si on a des filtres de date, filtrer avec les dates
 		if(dateDebutFiltre || dateFinFiltre) {
+			console.log("FILTRE DEBUT ", dateDebutFiltre, " FILTRE FIN ", dateFinFiltre);
+			console.log("TWEET DATE : ", dateTweet());
 			//On scroll tant qu'on a pas un tweet compris dans l'intervalle de dates
 			while((dateDebutFiltre ? dateTweet() > dateDebutFiltre : true) &&
 		 	(dateFinFiltre   ? dateTweet() < dateFinFiltre   : true)) {
-				
+				console.log("ON SCROLL");
 				window.scrollBy(0, window.innerHeight*0.9);
 				if(finProfil()) break;
+				console.log("FILTRE DEBUT ", dateDebutFiltre, " FILTRE FIN ", dateFinFiltre);
+				console.log("TWEET DATE : ", dateTweet());
 			}
+			console.log("ON A TROUVE UN TWEET DANS L'INTERVALLE");
 		}
 
 		//On récupère le premier tweet visible de la fenêtre
@@ -189,11 +200,13 @@ async function scrollBoucle() {
 			//Si c'est un retweet annuler le retweet
 			} else if(estRetweet(tweet)) {
 				console.log("RETWEET ", pseudoTweet);
+				window.scrollBy(0, window.innerHeight*0.9);
 				//await annulRetweet(tweet);
 
 			//Si c'est un tweet à moi supprimer avec les trois petits points
 			} else if(estMonTweet(tweet)) {
 				console.log("TWEET ", pseudoTweet);
+				window.scrollBy(0, window.innerHeight*0.9);
 				//await suppTweet(tweet);
 
 			//Un truc imprévu

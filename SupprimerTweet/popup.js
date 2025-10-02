@@ -75,12 +75,13 @@ document.addEventListener("DOMContentLoaded", () => {
         
     }
 
-    /***************************************************************************/
-    /***** LANCE LE SCRIPT DE SUPRESSION EN DETECTANT LES BOUTONS ACTIVES *****/
-    /***************************************************************************/
+    /*************************************************************************/
+    /***** ECOUTE LES BOUTONS ET AGIT SI L'URL EST CELLE DU PROFIL PERSO *****/
+    /*************************************************************************/
     async function lancerScriptSupp() {
         //Maintient le bouton enfoncé si la variable activeBoutonSuppression n'est pas nulle
         await maintientBoutonEnfonce();
+        //On récupère l'url du profil de l'utilisateur
         let { pseudo } = await browser.storage.local.get("pseudo");
         let url_profil = "https://x.com/" + pseudo;
         console.log(url_profil);
@@ -94,30 +95,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 let tab_active = await browser.tabs.query({ active: true, currentWindow: true });
                 if(tab_active[0].url == url_profil) {
                     
-                    //On vérifie sur quel bouton on clique
-                    if(bouton.closest('.suppression_filtree')) {
-                        let { activeBoutonSuppression } = await browser.storage.local.get("activeBoutonSuppression");
-                        console.log("ETAT DU BOUTON : ", activeBoutonSuppression);
-                        
-                        //L'arrêt de la suppression a été provoquée
-                        if(activeBoutonSuppression) {
-                            arretSuppression(bouton)
-                        //On lance la suppression si le bouton n'a pas encore été activé
-                        } else {
-                            lanceSuppressionFiltree(bouton, tab_active);
-                        }
-                    } else if (bouton.closest('.suppression_totale')) {
-                        let { activeBoutonSuppression } = await browser.storage.local.get("activeBoutonSuppression");
-                        console.log("ETAT DU BOUTON : ", activeBoutonSuppression);
+                    let { activeBoutonSuppression } = await browser.storage.local.get("activeBoutonSuppression");
+                    console.log("ETAT DU BOUTON : ", activeBoutonSuppression); 
 
-                        //L'arrêt de la suppression a été provoquée
-                        if(activeBoutonSuppression) {
-                            arretSuppression(bouton)
-                        //On lance la suppression si le bouton n'a pas encore été activé
-                        } else {
+                    //On a cliqué sur un bouton de suppression alors qu'une suppression est en cours
+                    if(activeBoutonSuppression) {
+                        arretSuppression(bouton)
+
+                    //Si le bouton n'a pas encore été activé, on lance la suppression
+                    } else {
+                        //On vérifie sur quel bouton on clique pour lancer la bonne suppression
+                        if(bouton.closest('.suppression_filtree')) {
+                            lanceSuppressionFiltree(bouton, tab_active);
+                        } else if (bouton.closest('.suppression_totale')) {
                             lanceSuppressionTotale(bouton, tab_active);
                         }
                     }
+
                 } else {
                     console.error("On n'est pas sur le profil de l'utilisateur");
                 }
@@ -129,5 +123,10 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
+    /***************************************************/
+    /***************************************************/
+    /********************* LE MAIN *********************/
+    /***************************************************/
+    /***************************************************/
     lancerScriptSupp();
 });

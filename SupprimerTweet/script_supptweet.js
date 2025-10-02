@@ -1,13 +1,5 @@
 (() => {
 
-async function boutonDesactive() {
-	let etatBouton = await browser.storage.local.get("activeBoutonSuppression");
-
-	if (etatBouton.activeBoutonSuppression) {
-		let boutonActif = document.querySelector('[class="activeBouton"]');
-		boutonActif.classList.remove("activeBouton");
-	}
-}
 
 /***********************************************/
 /*** APPARITION D'UN ELEMENT DANS LA FENETRE ***/
@@ -140,6 +132,12 @@ function premierTweetVisible() {
 async function scrollBoucle() {
 	let debut = Date.now();
 	while(Date.now() - debut < 10000){
+		//On vérifie que le bouton de suppression est bien activé, sinon on arrête de force la suppression
+		let { activeBoutonSuppression } = await browser.storage.local.get("activeBoutonSuppression");
+		if(!activeBoutonSuppression) {
+			console.error("L'arrêt de la suppression a été forcé.");
+			break;
+		}
 
 		//On récupère le premier tweet visible de la fenêtre
 		let tweet = premierTweetVisible();
@@ -156,12 +154,12 @@ async function scrollBoucle() {
 			//Si c'est un retweet annuler le retweet
 			} else if(estRetweet(tweet)) {
 				console.log("RETWEET ", pseudo);
-				await annulRetweet(tweet);
+				//await annulRetweet(tweet);
 
 			//Si c'est un tweet à moi supprimer avec les trois petits points
 			} else if(estMonTweet(tweet)) {
 				console.log("TWEET ", pseudo);
-				await suppTweet(tweet);
+				//await suppTweet(tweet);
 
 			//Un truc imprévu
 			} else {
@@ -176,8 +174,8 @@ async function scrollBoucle() {
 		await new Promise(tps => setTimeout(tps, 400));
 	}
 
-	boutonDesactive();
-	console.log("FIN DU PROGRAMME");
+	await browser.storage.local.set({activeBoutonSuppression: null});
+	console.log("***** FIN DU PROGRAMME *****");
 }
 
 
@@ -187,7 +185,7 @@ async function scrollBoucle() {
 /***************************************************/
 /***************************************************/
 let monPseudo = "@" + window.location.pathname.split("/")[1];
-console.log("SUPPRESSION TWEET DE ", monPseudo);
+console.log("***** SUPPRESSION TWEET DE ", monPseudo, " *****");
 scrollBoucle();
 
 })();

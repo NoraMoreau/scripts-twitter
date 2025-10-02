@@ -125,18 +125,53 @@ function premierTweetVisible() {
 	});
 }
 
+/*************************************/
+/***** GERE LES FILTRES DE DATE *****/
+/*************************************/
+async function dateTweet() {
+	let tweet = premierTweetVisible();
+	//on recup sa date
+}
+
+async function finProfil() {
+	let basPage = window.innerHeight + window.scrollY;
+	let hauteurTotale = document.documentElement.scrollHeight;
+	if(basPage >= hauteurTotale) {
+		await new Promise(tps => setTimeout(tps, 400));
+		return hauteurTotale == document.documentElement.scrollHeight;
+	}
+	return false;
+}
 
 /*************************************/
 /***** BOUCLE QUI SCROLL LA PAGE *****/
 /*************************************/
 async function scrollBoucle() {
+	let {dateDebutFiltre, dateFinFiltre, pseudoFiltre} = browser.storage.local.get("dateDebutFiltre", "dateFinFiltre", "pseudoFiltre");
 	let debut = Date.now();
+
 	while(Date.now() - debut < 10000){
 		//On vérifie que le bouton de suppression est bien activé, sinon on arrête de force la suppression
 		let { activeBoutonSuppression } = await browser.storage.local.get("activeBoutonSuppression");
 		if(!activeBoutonSuppression) {
 			console.error("L'arrêt de la suppression a été forcé.");
 			break;
+		}
+
+		//On vérifie si on est à la fin du profil
+		if(await finProfil()) {
+			break;
+		}
+
+		//Si on a des filtres de date, filtrer avec les dates
+		if(dateDebutFiltre || dateFinFiltre) {
+			//On scroll tant qu'on a pas un tweet compris dans l'intervalle de dates
+			while((dateDebutFiltre ? dateTweet() > dateDebutFiltre : true) &&
+		 	(dateFinFiltre   ? dateTweet() < dateFinFiltre   : true)) {
+				
+				window.scrollBy(0, window.innerHeight*0.9);
+				if(finProfil()) break;
+			}
 		}
 
 		//On récupère le premier tweet visible de la fenêtre
@@ -175,6 +210,7 @@ async function scrollBoucle() {
 	}
 
 	await browser.storage.local.set({activeBoutonSuppression: null});
+	await browser.storage.local.set({dateDebutFiltre: null, dateFinFiltre: null, pseudoFiltre: null});
 	console.log("***** FIN DU PROGRAMME *****");
 }
 

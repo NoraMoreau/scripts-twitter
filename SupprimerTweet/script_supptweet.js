@@ -131,7 +131,7 @@ function premierTweetVisible() {
 async function dateTweet() {
 	let tweet = premierTweetVisible();
 	if(tweet) {
-		let date = new Date( tweet.querySelector('time').getAttribute('datetime'));
+		let date = tweet.querySelector('time').getAttribute('datetime');
 		return date.split('T')[0];
 	}
 }
@@ -153,7 +153,7 @@ async function finProfil() {
 /***** BOUCLE QUI SCROLL LA PAGE *****/
 /*************************************/
 async function scrollBoucle() {
-	let {dateDebutFiltre, dateFinFiltre, pseudoFiltre} = browser.storage.local.get("dateDebutFiltre", "dateFinFiltre", "pseudoFiltre");
+	let { dateDebutFiltre, dateFinFiltre, pseudoFiltre } = await browser.storage.local.get(["dateDebutFiltre", "dateFinFiltre","pseudoFiltre"]);
 	let debut = Date.now();
 
 	while(Date.now() - debut < 10000){
@@ -172,15 +172,26 @@ async function scrollBoucle() {
 		//Si on a des filtres de date, filtrer avec les dates
 		if(dateDebutFiltre || dateFinFiltre) {
 			console.log("FILTRE DEBUT ", dateDebutFiltre, " FILTRE FIN ", dateFinFiltre);
-			console.log("TWEET DATE : ", dateTweet());
-			//On scroll tant qu'on a pas un tweet compris dans l'intervalle de dates
-			while((dateDebutFiltre ? dateTweet() > dateDebutFiltre : true) &&
-		 	(dateFinFiltre   ? dateTweet() < dateFinFiltre   : true)) {
+			console.log("TWEET DATE : ", await dateTweet());
+			console.log("dateTweet() < dateDebutFiltre = ", await dateTweet() < dateDebutFiltre);
+			console.log("dateTweet() > dateFinFiltre ", await dateTweet() > dateFinFiltre);
+			//On scroll tant qu'on n'a pas un tweet compris dans l'intervalle des dates
+			while((dateDebutFiltre ? await dateTweet() < dateDebutFiltre : false) ||
+		 	(dateFinFiltre   ? await dateTweet() > dateFinFiltre : false)) {
+				//On vérifie que le bouton de suppression est bien activé, sinon on arrête de force la suppression
+				let { activeBoutonSuppression } = await browser.storage.local.get("activeBoutonSuppression");
+				if(!activeBoutonSuppression) {
+					console.error("L'arrêt de la suppression a été forcé.");
+					break;
+				}
 				console.log("ON SCROLL");
 				window.scrollBy(0, window.innerHeight*0.9);
-				if(finProfil()) break;
+				await new Promise(tps => setTimeout(tps, 400));
 				console.log("FILTRE DEBUT ", dateDebutFiltre, " FILTRE FIN ", dateFinFiltre);
-				console.log("TWEET DATE : ", dateTweet());
+				console.log("TWEET DATE : ", await dateTweet());
+				console.log("dateTweet() < dateDebutFiltre = ", await dateTweet() < dateDebutFiltre);
+				console.log("dateTweet() > dateFinFiltre ", await dateTweet() > dateFinFiltre);
+				if(await finProfil()) break;
 			}
 			console.log("ON A TROUVE UN TWEET DANS L'INTERVALLE");
 		}

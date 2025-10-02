@@ -144,21 +144,21 @@ async function scrollBoucle() {
 
 		//Si un tweet est dispo, le supp si c'est un tweet de soi, ou le unretweet si c'est un retweet
 		if(tweet) {
-			let pseudo = tweet.querySelector('[data-testid="User-Name"] [tabindex="-1"]').innerText;
+			let pseudoTweet = tweet.querySelector('[data-testid="User-Name"] [tabindex="-1"]').innerText;
 
 			//Si c'est l'épinglé ne pas le toucher
 			if(estEpingle(tweet)) {
-				console.log("EPINGLE ", pseudo);
+				console.log("EPINGLE ", pseudoTweet);
 				window.scrollBy(0, window.innerHeight*0.9);
 
 			//Si c'est un retweet annuler le retweet
 			} else if(estRetweet(tweet)) {
-				console.log("RETWEET ", pseudo);
+				console.log("RETWEET ", pseudoTweet);
 				//await annulRetweet(tweet);
 
 			//Si c'est un tweet à moi supprimer avec les trois petits points
 			} else if(estMonTweet(tweet)) {
-				console.log("TWEET ", pseudo);
+				console.log("TWEET ", pseudoTweet);
 				//await suppTweet(tweet);
 
 			//Un truc imprévu

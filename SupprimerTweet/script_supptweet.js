@@ -125,14 +125,38 @@ function premierTweetVisible() {
 	});
 }
 
-/************************************/
-/***** GERE LES FILTRES DE DATE *****/
-/************************************/
+/***************************************/
+/***** RECUPERE LA DATE D'UN TWEET *****/
+/***************************************/
 async function dateTweet() {
 	let tweet = premierTweetVisible();
 	if(tweet) {
 		let date = tweet.querySelector('time').getAttribute('datetime');
 		return date.split('T')[0];
+	}
+}
+
+/*********************************************************/
+/***** CHERCHE UN TWEET CORRESPONDANT AU FILTRE DATE *****/
+/*********************************************************/
+async function chchTweetDansIntervalleDates(dateDebutFiltre, dateFinFiltre) {
+	//On scroll tant qu'on n'a pas un tweet compris dans l'intervalle des dates
+	while((dateDebutFiltre ? await dateTweet() < dateDebutFiltre : false) ||
+	(dateFinFiltre   ? await dateTweet() > dateFinFiltre : false)) {
+		//On vérifie que le bouton de suppression est bien activé, sinon on arrête de force la suppression
+		let { activeBoutonSuppression } = await browser.storage.local.get("activeBoutonSuppression");
+		if(!activeBoutonSuppression) {
+			console.error("L'arrêt de la suppression a été forcé.");
+			break;
+		}
+
+		window.scrollBy(0, window.innerHeight*0.9);
+		await new Promise(tps => setTimeout(tps, 400));
+
+		if(await finProfil()){
+			cleanVariablesLocales();
+			break;
+		}
 	}
 }
 
@@ -147,6 +171,14 @@ async function finProfil() {
 		return hauteurTotale == document.documentElement.scrollHeight;
 	}
 	return false;
+}
+
+/**************************************/
+/***** VIDE LES VARIABLES LOCALES *****/
+/**************************************/
+async function cleanVariablesLocales() {
+	await browser.storage.local.set({activeBoutonSuppression: null});
+	await browser.storage.local.set({dateDebutFiltre: null, dateFinFiltre: null, pseudoFiltre: null});
 }
 
 /*************************************/
@@ -164,36 +196,15 @@ async function scrollBoucle() {
 			break;
 		}
 
-		//On vérifie si on est à la fin du profil
+		//On vérifie à chaque fois si on est à la fin du profil
 		if(await finProfil()) {
+			cleanVariablesLocales();
 			break;
 		}
 
 		//Si on a des filtres de date, filtrer avec les dates
 		if(dateDebutFiltre || dateFinFiltre) {
-			console.log("FILTRE DEBUT ", dateDebutFiltre, " FILTRE FIN ", dateFinFiltre);
-			console.log("TWEET DATE : ", await dateTweet());
-			console.log("dateTweet() < dateDebutFiltre = ", await dateTweet() < dateDebutFiltre);
-			console.log("dateTweet() > dateFinFiltre ", await dateTweet() > dateFinFiltre);
-			//On scroll tant qu'on n'a pas un tweet compris dans l'intervalle des dates
-			while((dateDebutFiltre ? await dateTweet() < dateDebutFiltre : false) ||
-		 	(dateFinFiltre   ? await dateTweet() > dateFinFiltre : false)) {
-				//On vérifie que le bouton de suppression est bien activé, sinon on arrête de force la suppression
-				let { activeBoutonSuppression } = await browser.storage.local.get("activeBoutonSuppression");
-				if(!activeBoutonSuppression) {
-					console.error("L'arrêt de la suppression a été forcé.");
-					break;
-				}
-				console.log("ON SCROLL");
-				window.scrollBy(0, window.innerHeight*0.9);
-				await new Promise(tps => setTimeout(tps, 400));
-				console.log("FILTRE DEBUT ", dateDebutFiltre, " FILTRE FIN ", dateFinFiltre);
-				console.log("TWEET DATE : ", await dateTweet());
-				console.log("dateTweet() < dateDebutFiltre = ", await dateTweet() < dateDebutFiltre);
-				console.log("dateTweet() > dateFinFiltre ", await dateTweet() > dateFinFiltre);
-				if(await finProfil()) break;
-			}
-			console.log("ON A TROUVE UN TWEET DANS L'INTERVALLE");
+			await chchTweetDansIntervalleDates(dateDebutFiltre, dateFinFiltre);
 		}
 
 		//On récupère le premier tweet visible de la fenêtre
@@ -212,18 +223,31 @@ async function scrollBoucle() {
 			} else if(estRetweet(tweet)) {
 				console.log("RETWEET ", pseudoTweet);
 				window.scrollBy(0, window.innerHeight*0.9);
-				//await annulRetweet(tweet);
+
+				//On supprime si pas de filtre pseudo, sinon on vérifie le pseudo du tweet
+				if(!pseudoFiltre) {
+					await annulRetweet(tweet);
+				} else if (pseudoFiltre == pseudoTweet.split('@')[1]) {
+					await annulRetweet(tweet);
+				}
 
 			//Si c'est un tweet à moi supprimer avec les trois petits points
 			} else if(estMonTweet(tweet)) {
 				console.log("TWEET ", pseudoTweet);
 				window.scrollBy(0, window.innerHeight*0.9);
-				//await suppTweet(tweet);
+
+				//On supprime si pas de filtre pseudo, sinon on vérifie le pseudo du tweet
+				if(!pseudoFiltre) {
+					await suppTweet(tweet);
+				} else if (pseudoFiltre == pseudoTweet.split('@')[1]) {
+					await suppTweet(tweet);
+				}
 
 			//Un truc imprévu
 			} else {
 				console.log("IL Y A QUELQUE CHOSE D'IMPREVUE");
 				console.log(tweet);
+				cleanVariablesLocales();
 				break;
 			}
 		} else {
@@ -233,8 +257,7 @@ async function scrollBoucle() {
 		await new Promise(tps => setTimeout(tps, 400));
 	}
 
-	await browser.storage.local.set({activeBoutonSuppression: null});
-	await browser.storage.local.set({dateDebutFiltre: null, dateFinFiltre: null, pseudoFiltre: null});
+	cleanVariablesLocales();
 	console.log("***** FIN DU PROGRAMME *****");
 }
 

@@ -75,8 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
         browser.storage.local.set({ activeBoutonSuppression: null });
         browser.storage.local.set({dateDebutFiltre: null, dateFinFiltre: null, pseudoFiltre: null});
         desactiveBouton(bouton);
-        console.log("On désactive le bouton");
-        
+        console.log("On désactive le bouton");      
     }
 
     /*************************************************************************/

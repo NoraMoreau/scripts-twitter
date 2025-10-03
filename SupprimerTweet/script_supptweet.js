@@ -49,7 +49,7 @@ async function suppTweet(tweet) {
 	//Appuie sur les 3 petits points du tweet
 	tweet.querySelector('[data-testid="caret"]').click();
 
-	//Vérifie que le manu apparaisse bien après le click sur les ...
+	//Vérifie que le menu apparaisse bien après le click sur les ...
 	//Appuie sur supprimer dans le menu déroulant,
 	try {
 		let menuDeroulantTweet = await apparitionElement('[data-testid="Dropdown"]');
@@ -78,6 +78,10 @@ async function suppTweet(tweet) {
 /************************************/
 async function annulRetweet(tweet) {
 	//Appuie sur l'icone unretweet
+	while(!tweet.querySelector('[data-testid="unretweet"]')) {
+		window.scrollBy(0, window.innerHeight*0.2);
+		await apparitionElement('[data-testid="unretweet"]', 300);
+	}
 	tweet.querySelector('[data-testid="unretweet"]').click();
 
 	//Verifie que la fenêtre de unretweet apparaisse bien après le click sur l'icone
@@ -221,7 +225,6 @@ async function scrollBoucle() {
 			//Si c'est un retweet annuler le retweet
 			} else if(estRetweet(tweet)) {
 				console.log("RETWEET ", pseudoTweet);
-
 				//On supprime si pas de filtre pseudo, sinon on vérifie le pseudo du tweet
 				if(!pseudoFiltre) {
 					await annulRetweet(tweet);
@@ -232,7 +235,6 @@ async function scrollBoucle() {
 			//Si c'est un tweet à moi supprimer avec les trois petits points
 			} else if(estMonTweet(tweet)) {
 				console.log("TWEET ", pseudoTweet);
-
 				//On supprime si pas de filtre pseudo, sinon on vérifie le pseudo du tweet
 				if(!pseudoFiltre) {
 					await suppTweet(tweet);

@@ -18,10 +18,10 @@ document.addEventListener("DOMContentLoaded", () => {
             //Le bouton change de couleur et le script de suppression peut être lancé
             bouton.classList.add("activeBouton");
             browser.storage.local.set({ activeBoutonSuppression: "activeBoutonSuppressionFiltree" });
-            /*await browser.scripting.executeScript({ 
+            await browser.scripting.executeScript({ 
                 target: { tabId: tab_active[0].id },
                 files: ["script_supptweet.js"] 
-            });*/
+            });
         }
     }
 
@@ -33,10 +33,10 @@ document.addEventListener("DOMContentLoaded", () => {
         //Le bouton change de couleur et le script de suppression peut être lancé
         bouton.classList.add("activeBouton");
         browser.storage.local.set({ activeBoutonSuppression: "activeBoutonSuppressionTotale" });
-        /*await browser.scripting.executeScript({ 
+        await browser.scripting.executeScript({ 
             target: { tabId: tab_active[0].id },
             files: ["script_supptweet.js"] 
-        });*/
+        });
         
     }
 

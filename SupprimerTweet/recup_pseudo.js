@@ -21,3 +21,4 @@ if (!recupPseudo()) {
 }
 
 browser.storage.local.set({ activeBoutonSuppression: null });
+browser.storage.local.set({dateDebutFiltre: null, dateFinFiltre: null, pseudoFiltre: null});

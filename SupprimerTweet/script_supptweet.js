@@ -186,9 +186,8 @@ async function cleanVariablesLocales() {
 /*************************************/
 async function scrollBoucle() {
 	let { dateDebutFiltre, dateFinFiltre, pseudoFiltre } = await browser.storage.local.get(["dateDebutFiltre", "dateFinFiltre","pseudoFiltre"]);
-	let debut = Date.now();
 
-	while(Date.now() - debut < 10000){
+	while(true){
 		//On vérifie que le bouton de suppression est bien activé, sinon on arrête de force la suppression
 		let { activeBoutonSuppression } = await browser.storage.local.get("activeBoutonSuppression");
 		if(!activeBoutonSuppression) {
@@ -222,7 +221,6 @@ async function scrollBoucle() {
 			//Si c'est un retweet annuler le retweet
 			} else if(estRetweet(tweet)) {
 				console.log("RETWEET ", pseudoTweet);
-				window.scrollBy(0, window.innerHeight*0.9);
 
 				//On supprime si pas de filtre pseudo, sinon on vérifie le pseudo du tweet
 				if(!pseudoFiltre) {
@@ -234,7 +232,6 @@ async function scrollBoucle() {
 			//Si c'est un tweet à moi supprimer avec les trois petits points
 			} else if(estMonTweet(tweet)) {
 				console.log("TWEET ", pseudoTweet);
-				window.scrollBy(0, window.innerHeight*0.9);
 
 				//On supprime si pas de filtre pseudo, sinon on vérifie le pseudo du tweet
 				if(!pseudoFiltre) {
